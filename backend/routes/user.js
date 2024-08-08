@@ -18,9 +18,9 @@ const signupBody = z.object ({
 // User first time using the application
 router.post("/signup" , async (req , res) => {
     // I want to use my error message to be displayed so using safeParse()
-    const userValidate = signupBody.safeParse(req.body);
+    const { success } = signupBody.safeParse(req.body);
 
-    if(!userValidate.success) {
+    if(!success) {
         res.status(411).json({
             message : "Email already taken / Incorrect inputs"
         })
