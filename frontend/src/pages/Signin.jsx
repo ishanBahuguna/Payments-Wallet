@@ -1,15 +1,27 @@
-import React , { useState }from 'react'
+import React , { useState } from 'react'
 import Heading from '../components/Heading'
 import SubHeading from '../components/SubHeading'
 import InputBox from '../components/InputBox'
 import Button from '../components/Button'
 import ButtonWarning from '../components/ButtonWarning'
 import axios from 'axios'
-
+import { useNavigate } from 'react-router-dom'
 
 export default function Signin() {
   const [username , setUsename] = useState("");
   const [password , setPassword] = useState("");
+
+  
+
+  const handleSignin = async () => {
+    const navigate = useNavigate();
+    const response = await axios.post("http://localhost:3000/api/v1/user/signin" , {
+      username,
+      password
+    });
+    localStorage.setItem('token' , response.data.token);
+    navigate("/dashboard");
+  }
 
   return (
     <div className='bg-slate-300 h-screen flex justify-center'>
@@ -24,14 +36,7 @@ export default function Signin() {
             setPassword(e.target.value)
           }} placeholder={"Password"} label={"Password"}/>
           <div className='pt-4 mx-5'>
-              <Button onClick={  () => {
-                const response =axios.post("http://localhost:3000/api/v1/user/signin" , {
-                  username,
-                  password
-                });
-                localStorage.setItem("token" , response.data.token)
-              }
-              } label={"Sign in"}/>
+              <Button onClick={handleSignin} label={"Sign in"}/>
           </div>
           <ButtonWarning label={"Don't have an account"} buttonText={"Sign up"} to={"/signup"}/>
         </div>
