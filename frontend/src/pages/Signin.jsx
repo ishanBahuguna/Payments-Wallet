@@ -8,13 +8,11 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 export default function Signin() {
-  const [username , setUsename] = useState("");
+  const [username , setUsername] = useState("");
   const [password , setPassword] = useState("");
-
-  
+  const navigate = useNavigate();
 
   const handleSignin = async () => {
-    const navigate = useNavigate();
     const response = await axios.post("http://localhost:3000/api/v1/user/signin" , {
       username,
       password
@@ -30,7 +28,7 @@ export default function Signin() {
           <Heading label={"Sign in"}/>
           <SubHeading label={"Enter your credentials to access your account"}/>
           <InputBox onChange={e => {
-            setUsename(e.target.value)
+            setUsername(e.target.value)
           }} placeholder={"email"} label={"E-mail"}/>
           <InputBox onChange={e => {
             setPassword(e.target.value)

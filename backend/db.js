@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const bcrypt = require('bcrypt')
 // connect to MongoDB:
 mongoose.connect("mongodb+srv://ishanbahuguna:e7uQxz3Y1QEON3Fj@cluster0.pth1o34.mongodb.net/wallet");
 
@@ -32,6 +32,20 @@ const userSchema = new mongoose.Schema({
     maxLength: 50
   }
 }); 
+
+// method to generate hash from plain text:
+userSchema.methods.createHash = async (plainTextPassword) => {
+  // Hashing users salt and password with 10 iterations
+  const saltRounds = 10;
+
+  // First method to generate a salt and then create hash:
+  const salt = await bcrypt.genSalt(saltRounds);
+  return await bcrypt.hash(plainTextPassword , salt);
+}
+
+userSchema.methods.validatePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword , this.password);
+}
 
 const accountSchema = new mongoose.Schema({
   userId: [{ 

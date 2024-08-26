@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken")
 const { JWT_SECRET } = require("../config")
 const { authMiddleware}  = require("../middleware")
 
+
 const router = express.Router();
 
 const signupBody = z.object ({
@@ -36,14 +37,19 @@ router.post("/signup" , async (req , res) => {
         })
     }
 
-    const user = await User.create({
-        username : req.body.username,
+    const user = new User({
+        usernam : req.body.username,
         firstName : req.body.firstName,
         lastName : req.body.lastName,
-        password : req.body.password
     })
 
-    const userId = user._id;
+
+    let hashPassword = await user.createHash(req.body.password)
+    user.password = hashPassword;
+    
+    const savedUser = await user.save();
+
+    const userId = savedUser._id;
     const token = jwt.sign({
         userId
     },JWT_SECRET) 
@@ -79,25 +85,26 @@ router.post("/signin" , async (req , res) => {
     }
  
     const user = await User.findOne({
-        username : req.body.username,
-        password : req.body.password
+        username : req.body.username
     })
 
-
+    console.log(user)
     if(user) {
-        const token = jwt.sign({
-            userId:user._id
-        }, JWT_SECRET)
-
-        res.status(200).json({
-            token:token
-        })
-        return
+        // if(await user.validatePassword(req.body.password)) {
+            const token = jwt.sign({
+                userId:user._id
+            } , JWT_SECRET)
+            return res.status(200).json({
+                token:token,
+                message:"User Logged in successfully"
+            })
+        // }
     }
-
-    res.status(411).json({
-        message: "Error while logging in"
-    })
+    else {
+        return res.status(411).json({
+            message: "Error while logging in"
+        })
+    }
 })
 
 const updateBody = z.object ({
